@@ -1,0 +1,526 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BCB71DDA-4856-4FEE-9EE0-A9F1DE3D8833}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cryptsy</RootNamespace>
+    <AssemblyName>Cryptsy</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\..\Downloads\Json50r8\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="JSON\Balances.cs" />
+    <Compile Include="JSON\BalancesJsonTypes\BalancesAvailable.cs" />
+    <Compile Include="JSON\BalancesJsonTypes\BalancesHold.cs" />
+    <Compile Include="JSON\BalancesJsonTypes\Return.cs" />
+    <Compile Include="JSON\Buyorder.cs" />
+    <Compile Include="JSON\MyOrders.cs" />
+    <Compile Include="JSON\MyOrdersJsonTypes\Return.cs" />
+    <Compile Include="JSON\MyTrades.cs" />
+    <Compile Include="JSON\OrderResponse.cs" />
+    <Compile Include="JSON\orders.cs" />
+    <Compile Include="JSON\Return.cs" />
+    <Compile Include="JSON\SampleResponse1.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ADTLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ADTXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ALFBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\AMCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ANCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ARGBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ASCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ASCXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\BQCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\BTBBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\BTEBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\BTGBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\BUKBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder10.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder11.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder12.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder13.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder14.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder15.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder16.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder17.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder18.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder19.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder2.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder20.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder21.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder22.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder23.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder24.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder25.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder26.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder27.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder28.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder29.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder3.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder30.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder31.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder32.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder33.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder34.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder35.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder36.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder37.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder38.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder39.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder4.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder40.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder41.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder42.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder43.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder44.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder45.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder46.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder47.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder48.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder49.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder5.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder50.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder51.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder52.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder53.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder54.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder55.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder56.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder57.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder58.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder59.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder6.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder60.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder61.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder62.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder63.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder64.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder65.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder66.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder67.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder68.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder69.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder7.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder70.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder71.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder72.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder73.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder74.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder75.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder76.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder77.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder78.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder79.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder8.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder80.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder81.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder82.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder83.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder84.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder85.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder86.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder87.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder88.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder89.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder9.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder90.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Buyorder91.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CAPBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CENTLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CENTXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CGBBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CLRBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CMCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CNCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\COLLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\COLXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DOGELTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DOGEBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CPRLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CRCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\CSCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DBLLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DGCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DGCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\DVCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ELCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ELPLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\EMDBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\EZCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\FLOLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\FRCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\FRKBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\FSTBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\FTCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GDCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GLCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GLDBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GLDLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GLXBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\GMELTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\HBNBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\IFCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\IFCXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\IXCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\JKCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\KGCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\LK7BTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\LKYBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\LTCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Markets.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\MECBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\MECLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\MEMLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\MNCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\MSTLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NBLBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NECBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NETLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NETXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NMCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NRBBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\NVCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PHSBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PointsBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PPCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PTSBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PXCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PXCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\PYCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\QRKBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade10.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade11.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade12.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade13.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade14.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade15.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade16.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade17.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade18.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade19.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade2.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade20.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade21.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade22.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade23.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade24.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade25.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade26.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade27.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade28.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade29.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade3.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade30.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade31.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade32.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade33.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade34.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade35.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade36.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade37.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade38.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade39.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade4.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade40.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade41.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade42.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade43.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade44.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade45.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade46.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade47.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade48.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade49.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade5.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade50.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade51.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade52.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade53.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade54.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade55.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade56.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade57.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade58.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade59.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade6.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade60.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade61.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade62.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade63.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade64.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade65.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade66.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade67.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade68.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade69.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade7.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade70.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade71.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade72.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade73.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade74.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade75.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade76.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade77.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade78.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade79.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade8.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade80.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade81.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade82.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade83.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade84.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade85.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade86.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade87.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade88.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade89.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade9.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade90.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade91.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Recenttrade92.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\REDLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Return.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\RYCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\SBCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder10.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder11.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder12.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder13.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder14.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder15.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder16.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder17.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder18.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder19.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder2.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder20.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder21.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder22.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder23.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder24.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder25.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder26.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder27.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder28.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder29.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder3.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder30.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder31.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder32.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder33.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder34.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder35.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder36.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder37.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder38.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder39.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder4.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder40.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder41.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder42.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder43.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder44.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder45.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder46.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder47.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder48.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder49.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder5.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder50.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder51.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder52.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder53.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder54.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder55.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder56.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder57.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder58.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder59.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder6.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder60.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder61.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder62.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder63.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder64.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder65.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder66.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder67.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder68.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder69.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder7.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder70.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder71.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder72.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder73.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder74.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder75.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder76.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder77.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder78.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder79.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder8.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder80.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder81.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder82.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder83.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder84.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder85.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder86.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder87.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder88.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder89.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder9.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder90.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder91.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\Sellorder92.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\SPTBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\SRCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\SXCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\TAGBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\TEKBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\TIXLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\TIXXPM.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\TRCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\WDCBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\WDCLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\XJOBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\XPMBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\XPMLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\YACBTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\YACLTC.cs" />
+    <Compile Include="JSON\SampleResponse1JsonTypes\ZETBTC.cs" />
+    <Compile Include="JSON\Sellorder.cs" />
+    <Compile Include="JSON\Trade.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>5</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="start.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
