@@ -11,14 +11,15 @@ using Example;
 using MarketOrders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace Cryptsy
 {
     class Program
     {
         static ASCIIEncoding encoding = new ASCIIEncoding();
-        static string key = "";
-        static string sKey = "";
+        static string key = ConfigurationManager.AppSettings["pubKey"];
+        static string sKey = ConfigurationManager.AppSettings["privKey"];
 
         static double sellFee = 0.997f;
         static double buyFee = 0.998f;
