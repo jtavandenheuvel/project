@@ -140,23 +140,19 @@ namespace Cryptsy
                 {
                     btcStart = double.Parse( info.Return.BalancesAvailable.BTC );
                     ltcStart = double.Parse( info.Return.BalancesAvailable.LTC );
-                    DOGEStart = double.Parse( info.Return.BalancesAvailable.DOGE );
                     xpmStart = double.Parse( info.Return.BalancesAvailable.XPM );
                     mecStart = double.Parse( info.Return.BalancesAvailable.MEC );
                     DGCStart = double.Parse( info.Return.BalancesAvailable.DGC );
                     PXCStart = double.Parse( info.Return.BalancesAvailable.PXC );
-                    YACStart = double.Parse( info.Return.BalancesAvailable.YAC );
                     GLDStart = double.Parse( info.Return.BalancesAvailable.GLD );
                     WDCStart = double.Parse( info.Return.BalancesAvailable.WDC );
                 }
                 btcCurrent = double.Parse( info.Return.BalancesAvailable.BTC ) + double.Parse( info.Return.BalancesHold.BTC );
                 ltcCurrent = double.Parse( info.Return.BalancesAvailable.LTC ) + double.Parse( info.Return.BalancesHold.LTC );
-                DOGECurrent = double.Parse( info.Return.BalancesAvailable.DOGE ) + double.Parse( info.Return.BalancesHold.DOGE );
                 xpmCurrent = double.Parse( info.Return.BalancesAvailable.XPM ) + double.Parse( info.Return.BalancesHold.XPM );
                 mecCurrent = double.Parse( info.Return.BalancesAvailable.MEC ) + double.Parse( info.Return.BalancesHold.MEC );
                 DGCCurrent = double.Parse( info.Return.BalancesAvailable.DGC ) + double.Parse( info.Return.BalancesHold.DGC );
                 PXCCurrent = double.Parse( info.Return.BalancesAvailable.PXC ) + double.Parse( info.Return.BalancesHold.PXC );
-                YACCurrent = double.Parse( info.Return.BalancesAvailable.YAC ) + double.Parse( info.Return.BalancesHold.YAC );
                 GLDCurrent = double.Parse( info.Return.BalancesAvailable.GLD ) + double.Parse( info.Return.BalancesHold.GLD );
                 WDCCurrent = double.Parse( info.Return.BalancesAvailable.WDC ) + double.Parse( info.Return.BalancesHold.WDC );
                 if( count % roundsForBalanceInfo == 0 )
@@ -164,12 +160,10 @@ namespace Cryptsy
                     Console.WriteLine( "---------------- BALANCE INFO after " + count + " rounds -----------" );
                     Console.WriteLine( "BTC start: " + btcStart.ToString() + " current: " + btcCurrent.ToString() + " difference: " + ( btcCurrent - btcStart ).ToString() );
                     Console.WriteLine( "LTC start: " + ltcStart.ToString() + " current: " + ltcCurrent.ToString() + " difference: " + ( ltcCurrent - ltcStart ).ToString() );
-                    Console.WriteLine( "DOGE start: " + DOGEStart.ToString() + " current: " + DOGECurrent.ToString() + " difference: " + ( DOGECurrent - DOGEStart ).ToString() );
                     Console.WriteLine( "XPM start: " + xpmStart.ToString() + " current: " + xpmCurrent.ToString() + " difference: " + ( xpmCurrent - xpmStart ).ToString() );
                     Console.WriteLine( "MEC start: " + mecStart.ToString() + " current: " + mecCurrent.ToString() + " difference: " + ( mecCurrent - mecStart ).ToString() );
                     Console.WriteLine( "DGC start: " + DGCStart.ToString() + " current: " + DGCCurrent.ToString() + " difference: " + ( DGCCurrent - DGCStart ).ToString() );
                     Console.WriteLine( "PXC start: " + PXCStart.ToString() + " current: " + PXCCurrent.ToString() + " difference: " + ( PXCCurrent - PXCStart ).ToString() );
-                    Console.WriteLine( "YAC start: " + YACStart.ToString() + " current: " + YACCurrent.ToString() + " difference: " + ( YACCurrent - YACStart ).ToString() );
                     Console.WriteLine( "GLD start: " + GLDStart.ToString() + " current: " + GLDCurrent.ToString() + " difference: " + ( GLDCurrent - GLDStart ).ToString() );
                     Console.WriteLine( "WDC start: " + WDCStart.ToString() + " current: " + WDCCurrent.ToString() + " difference: " + ( WDCCurrent - WDCStart ).ToString() );
                     Console.WriteLine();
@@ -198,8 +192,6 @@ namespace Cryptsy
                 Orders DOGEBTCmarket = taskArray[2].Result;
 
                 double DOGEAmount = Math.Ceiling( 0.1d / ( ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 500;
-
-
 
                 Console.WriteLine( "" );
                 Balances info = getInfo();
@@ -257,7 +249,7 @@ namespace Cryptsy
                             cancelOrdersOnMarket( markets.DOGEBTC.Marketid );
                             cleanCount++;
                         }
-                        else if( cleanCount == 10 )
+                        else if( cleanCount == roundTimeOutWhenCleaning/2 )
                         {
                             for( int x = 0; x < backUpOrders.Return.Length; x++ )
                             {
