@@ -1,17 +1,14 @@
 ﻿using System;
-using System.IO;
+using System.Configuration;
 using System.Net;
 using System.Net.Cache;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptsy.OrderInfo;
 using Cryptsy.SampleResponse1JsonTypes;
-using Example;
 using MarketOrders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Configuration;
 
 namespace Cryptsy
 {
@@ -27,9 +24,11 @@ namespace Cryptsy
         private const short roundsForBalanceInfo = 50;
         private static int maxSimuOrdersPerCoin = 3;
         private static double cleanTime = 1;
-        private const int roundTimeOutWhenCleaning = 20;
+        private const int roundTimeOutWhenCleaning = 50;
         private static int cleanCount = 0;
         private static DateTime now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId( DateTime.UtcNow, "Eastern Standard Time" );
+        private static double maxLTC = 3.5;
+        private static double raiseJump = 0.00000100;
 
         public static string ByteToString( byte[] buff )
         {
@@ -93,35 +92,27 @@ namespace Cryptsy
             {
                 if( marketString.Equals( "XPM" ) )
                 {
-                    handleXPMMarket( ref count, ref countClean, markets );
+                    handleXPMLTCMarket( ref count, ref countClean, markets );
                 }
-                else if( marketString.Equals( "MEC" ) )
+                else if( marketString.Equals( "MECLTC" ) )
                 {
-                    handleMECMarket( ref count, ref countClean, markets );
+                    handleMECLTCMarket( ref count, ref countClean, markets );
                 }
-                else if( marketString.Equals( "DGC" ) )
+                else if( marketString.Equals( "DGCLTC" ) )
                 {
-                    handleDGCMarket( ref count, ref countClean, markets );
+                    handleDGCLTCMarket( ref count, ref countClean, markets );
                 }
-                else if( marketString.Equals( "PXC" ) )
+                else if( marketString.Equals( "PXCLTC" ) )
                 {
-                    handlePXCMarket( ref count, ref countClean, markets );
+                    handlePXCLTCMarket( ref count, ref countClean, markets );
                 }
-                else if( marketString.Equals( "YAC" ) )
+                else if( marketString.Equals( "GLDLTC" ) )
                 {
-                    handleYACMarket( ref count, ref countClean, markets );
+                    handleGLDLTCMarket( ref count, ref countClean, markets );
                 }
-                else if( marketString.Equals( "GLD" ) )
+                else if( marketString.Equals( "WDCLTC" ) )
                 {
-                    handleGLDMarket( ref count, ref countClean, markets );
-                }
-                else if( marketString.Equals( "WDC" ) )
-                {
-                    handleWDCMarket( ref count, ref countClean, markets );
-                }
-                else if( marketString.Equals( "DOGE" ) )
-                {
-                    handleDOGEMarket( ref count, ref countClean, markets );
+                    handleWDCLTCMarket( ref count, ref countClean, markets );
                 }
                 else if( marketString.Equals( "MONITOR" ) )
                 {
@@ -176,7 +167,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleDOGEMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleDOGELTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -191,7 +182,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders DOGEBTCmarket = taskArray[2].Result;
 
-                double DOGEAmount = Math.Ceiling( 0.1d / ( ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 500;
+                double DOGEAmount = Math.Ceiling( 0.1d / ( ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 500;
 
                 Console.WriteLine( "" );
                 Balances info = getInfo();
@@ -222,7 +213,7 @@ namespace Cryptsy
                 double possibleDOGE = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( DOGEltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar DOGE
-                double countDOGE = ( countLTC / 1.002d ) / double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countDOGE = ( countLTC / 1.002d ) / double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //DOGE naar BTC
                 double countBTC = countDOGE * double.Parse( DOGEBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -230,7 +221,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( DOGEBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 DOGE instaat
-                if( priceNeededOfferStrat > double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     Task<MyOrders>[] myOrders = { Task<MyOrders>.Factory.StartNew( () => getOrdersByMarketID( markets.DOGEBTC.Marketid ) ) };
                     countClean++;
@@ -238,30 +229,17 @@ namespace Cryptsy
                     if( TimeZoneInfo.ConvertTimeBySystemTimeZoneId( DateTime.UtcNow, "Eastern Standard Time" ).Subtract( now ).TotalHours > cleanTime )
                     {
                         Console.WriteLine( "SHOULD CLEAN" );
-                        if( cleanCount == roundTimeOutWhenCleaning || ( myOrders[0].Result.Return.Length == 0 && countClean == 0 ) )
+                        if( cleanCount == roundTimeOutWhenCleaning || ( myOrders[0].Result.Return.Length == 0 ) )
                         {
                             now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId( DateTime.UtcNow, "Eastern Standard Time" );
-                            cleanCount = 0;
                         }
                         else if( cleanCount == 0 )
                         {
-                            backUpOrders = myOrders[0].Result;
-                            cancelOrdersOnMarket( markets.DOGEBTC.Marketid );
-                            cleanCount++;
-                        }
-                        else if( cleanCount == roundTimeOutWhenCleaning/2 )
-                        {
-                            for( int x = 0; x < backUpOrders.Return.Length; x++ )
+                            for( int i = 0; i < myOrders[0].Result.Return.Length; i++ )
                             {
-                                placeOrder( markets.DOGEBTC.Marketid, "Sell", double.Parse( backUpOrders.Return[x].Quantity ), btcPrice );
+                                cancelOrder( myOrders[0].Result.Return[i].Orderid );
                             }
-                            cleanCount++;
                         }
-                        else
-                        {
-                            cleanCount++;
-                        }
-
                     }
                     else
                     {
@@ -272,10 +250,10 @@ namespace Cryptsy
                             Console.WriteLine( " INITIAL DOGE" );
 
                             //Buy new DOGE
-                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                            currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * DOGEAmount;
+                            currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * DOGEAmount;
                             if( orderArray[0].Result.Success.Equals( "1" ) )
                             {
                                 currentOrder = orderArray[0].Result;
@@ -290,23 +268,47 @@ namespace Cryptsy
                             if( currentSellToBTCOrders < maxSimuOrdersPerCoin )
                             {
                                 Console.WriteLine( "SOLD DOGE RESELL AND NEW ORDERS" );
-                                Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
-                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) ),
-                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, currentPrice ) )};
-                                if( orderArray[2].Result.Success.Equals( "1" ) )
+                                if( ltcCurrent > maxLTC )
                                 {
-                                    currentOrder = orderArray[2].Result;
+                                    Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
+                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, currentPrice ) )};
+                                    if( orderArray[1].Result.Success.Equals( "1" ) )
+                                    {
+                                        currentOrder = orderArray[1].Result;
+                                    }
+                                    else
+                                    {
+                                        currentOrder = null;
+                                    }
                                 }
                                 else
                                 {
-                                    currentOrder = null;
+                                    Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
+                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) ),
+                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, currentPrice ) )};
+                                    if( orderArray[2].Result.Success.Equals( "1" ) )
+                                    {
+                                        currentOrder = orderArray[2].Result;
+                                    }
+                                    else
+                                    {
+                                        currentOrder = null;
+                                    }
                                 }
+
                             }
                             else
                             {
                                 Console.WriteLine( "SOLD DOGE RESELL AND MAX REACHED" );
-                                Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
+                                if( ltcCurrent > maxLTC )
+                                {
+                                    Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice ) ) };
+                                }
+                                else
+                                {
+                                    Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
                                     Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) )};
+                                }
                                 currentOrder = null;
                             }
                         }
@@ -316,60 +318,75 @@ namespace Cryptsy
 
                             Console.WriteLine( "Found higher price" );
                             cancelOrdersOnMarket( markets.DOGELTC.Marketid );
-                            currentOrder = placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * DOGEAmount;
+                            currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * DOGEAmount;
 
 
                         }
                         if( DOGEAvailable - DOGEStart > DOGEAmount )
                         {
                             Console.WriteLine( "Selling partial bought DOGE" );
-                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
-                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) )};
-                        }
-                        if( countClean == 20 && false )
-                        {
-                            Console.WriteLine( "Doing cleanup!" );
-
-                            if( ( currentPrice - double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                            if( ltcCurrent > maxLTC )
                             {
-                                Console.WriteLine( "Found gap between 1 and 2 price" );
-                                cancelOrdersOnMarket( markets.DOGELTC.Marketid );
-                                currentOrder = placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
-                                if( !currentOrder.Success.Equals( "1" ) )
-                                {
-                                    currentOrder = null;
-                                }
-                                currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                                ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * DOGEAmount;
+                                Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice ) ) };
                             }
-                            countClean = 0;
+                            else
+                            {
+                                Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
+                                    Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) )};
+                            }
                         }
-                        btcPrice = double.Parse( DOGEBTCmarket.Return.Buyorders[0].Buyprice );
-                        ltcPrice = double.Parse( ltcbtcmarket.Return.Sellorders[0].Sellprice );
+
                     }
+                    if( countClean == 20 && false )
+                    {
+                        Console.WriteLine( "Doing cleanup!" );
+
+                        if( ( currentPrice - double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
+                        {
+                            Console.WriteLine( "Found gap between 1 and 2 price" );
+                            cancelOrdersOnMarket( markets.DOGELTC.Marketid );
+                            currentOrder = placeOrder( markets.DOGELTC.Marketid, "Buy", DOGEAmount, double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
+                            if( !currentOrder.Success.Equals( "1" ) )
+                            {
+                                currentOrder = null;
+                            }
+                            currentPrice = double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( DOGEltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * DOGEAmount;
+                        }
+                        countClean = 0;
+                    }
+                    btcPrice = double.Parse( DOGEBTCmarket.Return.Buyorders[0].Buyprice );
+                    ltcPrice = double.Parse( ltcbtcmarket.Return.Sellorders[0].Sellprice );
                 }
                 else if( currentOrder != null )
                 {
                     if( getOrdersByMarketID( markets.DOGELTC.Marketid ).Return.Length == 0 )
                     {
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
+                        if( ltcCurrent > maxLTC )
+                        {
+                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice ) ) };
+                        }
+                        else
+                        {
+                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew(() =>  placeOrder( markets.DOGEBTC.Marketid, "Sell", DOGEAmount, btcPrice )),
                                     Task<OrderResponse>.Factory.StartNew(() => placeOrder( markets.LTCBTC.Marketid, "Buy", ltcSpend, ltcPrice ) )};
-                        countClean = 0;
-                        transactionDone++;
-                        //Buy new DOGE
-                        Console.WriteLine( "SOLD DOGE AND NEW ORDERS BEFORE CANCEL" );
+                        }
                     }
-                    Console.WriteLine( "Cancel orders!! Not profitable!" );
-                    cancelOrdersOnMarket( markets.DOGELTC.Marketid );
-                    currentOrder = null;
                     countClean = 0;
+                    transactionDone++;
+                    //Buy new DOGE
+                    Console.WriteLine( "SOLD DOGE AND NEW ORDERS BEFORE CANCEL" );
                 }
+                Console.WriteLine( "Cancel orders!! Not profitable!" );
+                cancelOrdersOnMarket( markets.DOGELTC.Marketid );
+                currentOrder = null;
+                countClean = 0;
             }
             catch( Exception e )
             {
@@ -381,7 +398,7 @@ namespace Cryptsy
         }
 
 
-        private static void handleWDCMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleWDCLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -396,7 +413,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders WDCBTCmarket = taskArray[2].Result;
 
-                double WDCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double WDCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -429,7 +446,7 @@ namespace Cryptsy
                 double possibleWDC = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( WDCltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar WDC
-                double countWDC = ( countLTC / 1.002d ) / double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countWDC = ( countLTC / 1.002d ) / double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //WDC naar BTC
                 double countBTC = countWDC * double.Parse( WDCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -437,7 +454,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( WDCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 WDC instaat
-                if( priceNeededOfferStrat > double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -447,10 +464,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL WDC" );
 
                         //Buy new WDC
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * WDCAmount;
+                        currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * WDCAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -491,13 +508,13 @@ namespace Cryptsy
 
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.WDCLTC.Marketid );
-                        currentOrder = placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * WDCAmount;
+                        currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * WDCAmount;
 
 
                     }
@@ -511,17 +528,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.WDCLTC.Marketid );
-                            currentOrder = placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.WDCLTC.Marketid, "Buy", WDCAmount, double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * WDCAmount;
+                            currentPrice = double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( WDCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * WDCAmount;
                         }
                         countClean = 0;
                     }
@@ -554,7 +571,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleGLDMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleGLDLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -569,7 +586,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders GLDBTCmarket = taskArray[2].Result;
 
-                double GLDAmount = Math.Ceiling( 0.1d / ( ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double GLDAmount = Math.Ceiling( 0.1d / ( ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -602,7 +619,7 @@ namespace Cryptsy
                 double possibleGLD = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( GLDltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar GLD
-                double countGLD = ( countLTC / 1.002d ) / double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countGLD = ( countLTC / 1.002d ) / double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //GLD naar BTC
                 double countBTC = countGLD * double.Parse( GLDBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -610,7 +627,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( GLDBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 GLD instaat
-                if( priceNeededOfferStrat > double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -620,10 +637,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL GLD" );
 
                         //Buy new GLD
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * GLDAmount;
+                        currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * GLDAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -664,13 +681,13 @@ namespace Cryptsy
 
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.GLDLTC.Marketid );
-                        currentOrder = placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * GLDAmount;
+                        currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * GLDAmount;
 
 
                     }
@@ -684,17 +701,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.GLDLTC.Marketid );
-                            currentOrder = placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.GLDLTC.Marketid, "Buy", GLDAmount, double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * GLDAmount;
+                            currentPrice = double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( GLDltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * GLDAmount;
                         }
                         countClean = 0;
                     }
@@ -727,7 +744,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleYACMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleYACLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -742,7 +759,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders YACBTCmarket = taskArray[2].Result;
 
-                double YACAmount = Math.Ceiling( 0.1d / ( ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double YACAmount = Math.Ceiling( 0.1d / ( ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -775,7 +792,7 @@ namespace Cryptsy
                 double possibleYAC = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( YACltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar YAC
-                double countYAC = ( countLTC / 1.002d ) / double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countYAC = ( countLTC / 1.002d ) / double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //YAC naar BTC
                 double countBTC = countYAC * double.Parse( YACBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -783,7 +800,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( YACBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 YAC instaat
-                if( priceNeededOfferStrat > double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -793,10 +810,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL YAC" );
 
                         //Buy new YAC
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * YACAmount;
+                        currentPrice = double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * YACAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -837,13 +854,13 @@ namespace Cryptsy
 
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.YACLTC.Marketid );
-                        currentOrder = placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * YACAmount;
+                        currentPrice = double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * YACAmount;
 
 
                     }
@@ -857,17 +874,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.YACLTC.Marketid );
-                            currentOrder = placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.YACLTC.Marketid, "Buy", YACAmount, double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * YACAmount;
+                            currentPrice = double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( YACltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * YACAmount;
                         }
                         countClean = 0;
                     }
@@ -900,7 +917,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handlePXCMarket( ref int count, ref int countClean, Markets markets )
+        private static void handlePXCLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -915,7 +932,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders PXCBTCmarket = taskArray[2].Result;
 
-                double PXCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double PXCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -948,7 +965,7 @@ namespace Cryptsy
                 double possiblePXC = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( PXCltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar PXC
-                double countPXC = ( countLTC / 1.002d ) / double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countPXC = ( countLTC / 1.002d ) / double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //PXC naar BTC
                 double countBTC = countPXC * double.Parse( PXCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -956,7 +973,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( PXCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 PXC instaat
-                if( priceNeededOfferStrat > double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -966,10 +983,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL PXC" );
 
                         //Buy new PXC
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * PXCAmount;
+                        currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * PXCAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -1010,13 +1027,13 @@ namespace Cryptsy
 
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.PXCLTC.Marketid );
-                        currentOrder = placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * PXCAmount;
+                        currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * PXCAmount;
 
 
                     }
@@ -1030,17 +1047,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.PXCLTC.Marketid );
-                            currentOrder = placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.PXCLTC.Marketid, "Buy", PXCAmount, double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * PXCAmount;
+                            currentPrice = double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( PXCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * PXCAmount;
                         }
                         countClean = 0;
                     }
@@ -1073,7 +1090,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleDGCMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleDGCLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -1088,7 +1105,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders DGCBTCmarket = taskArray[2].Result;
 
-                double DGCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double DGCAmount = Math.Ceiling( 0.1d / ( ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -1121,7 +1138,7 @@ namespace Cryptsy
                 double possibleDGC = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( DGCltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar DGC
-                double countDGC = ( countLTC / 1.002d ) / double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countDGC = ( countLTC / 1.002d ) / double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //DGC naar BTC
                 double countBTC = countDGC * double.Parse( DGCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -1129,7 +1146,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( DGCBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 DGC instaat
-                if( priceNeededOfferStrat > double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -1139,10 +1156,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL DGC" );
 
                         //Buy new DGC
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * DGCAmount;
+                        currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * DGCAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -1182,13 +1199,13 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.DGCLTC.Marketid );
-                        currentOrder = placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * DGCAmount;
+                        currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * DGCAmount;
 
                     }
                     if( DGCAvailable - DGCStart > DGCAmount )
@@ -1201,17 +1218,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.DGCLTC.Marketid );
-                            currentOrder = placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.DGCLTC.Marketid, "Buy", DGCAmount, double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * DGCAmount;
+                            currentPrice = double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( DGCltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * DGCAmount;
                         }
                         countClean = 0;
                     }
@@ -1244,7 +1261,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleMECMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleMECLTCMarket( ref int count, ref int countClean, Markets markets )
         {
 
             try
@@ -1260,7 +1277,7 @@ namespace Cryptsy
                 Orders ltcbtcmarket = taskArray[1].Result;
                 Orders MECBTCmarket = taskArray[2].Result;
 
-                double mecAmount = Math.Ceiling( 0.1d / ( ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d ) ) + 1;
+                double mecAmount = Math.Ceiling( 0.1d / ( ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d ) ) + 1;
 
 
 
@@ -1293,7 +1310,7 @@ namespace Cryptsy
                 double possibleMEC = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( mecltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar MEC
-                double countMEC = ( countLTC / 1.002d ) / double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countMEC = ( countLTC / 1.002d ) / double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //MEC naar BTC
                 double countBTC = countMEC * double.Parse( MECBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -1301,7 +1318,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( MECBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 MEC instaat
-                if( priceNeededOfferStrat > double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     countClean++;
                     //check if you have already ordered 1 at the current best price
@@ -1311,10 +1328,10 @@ namespace Cryptsy
                         Console.WriteLine( " INITIAL MEC" );
 
                         //Buy new MEC
-                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                        Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                        currentPrice = double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * mecAmount;
+                        currentPrice = double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * mecAmount;
                         if( orderArray[0].Result.Success.Equals( "1" ) )
                         {
                             currentOrder = orderArray[0].Result;
@@ -1355,13 +1372,13 @@ namespace Cryptsy
 
                         Console.WriteLine( "Found higher price" );
                         cancelOrdersOnMarket( markets.MECLTC.Marketid );
-                        currentOrder = placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
+                        currentOrder = placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
                         if( !currentOrder.Success.Equals( "1" ) )
                         {
                             currentOrder = null;
                         }
-                        currentPrice = double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                        ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d * mecAmount;
+                        currentPrice = double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                        ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d * mecAmount;
 
 
                     }
@@ -1375,17 +1392,17 @@ namespace Cryptsy
                     {
                         Console.WriteLine( "Doing cleanup!" );
 
-                        if( ( currentPrice - double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                        if( ( currentPrice - double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                         {
                             Console.WriteLine( "Found gap between 1 and 2 price" );
                             cancelOrdersOnMarket( markets.MECLTC.Marketid );
-                            currentOrder = placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                            currentOrder = placeOrder( markets.MECLTC.Marketid, "Buy", mecAmount, double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
                             }
-                            currentPrice = double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d * mecAmount;
+                            currentPrice = double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( mecltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d * mecAmount;
                         }
                         countClean = 0;
                     }
@@ -1418,7 +1435,7 @@ namespace Cryptsy
             }
         }
 
-        private static void handleXPMMarket( ref int count, ref int countClean, Markets markets )
+        private static void handleXPMLTCMarket( ref int count, ref int countClean, Markets markets )
         {
             try
             {
@@ -1465,7 +1482,7 @@ namespace Cryptsy
                 double possibleXPM = ( double.Parse( ltcbtcmarket.Return.Sellorders[0].Quantity ) * buyFee ) / double.Parse( xpmltcmarket.Return.Sellorders[0].Sellprice );
 
                 //LTC naar XPM
-                double countXPM = ( countLTC / 1.002d ) / double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
+                double countXPM = ( countLTC / 1.002d ) / double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
 
                 //XPM naar BTC
                 double countBTC = countXPM * double.Parse( XPMBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d;
@@ -1473,7 +1490,7 @@ namespace Cryptsy
                 double priceNeededOfferStrat = ( countLTC / 1.002d ) / ( minimumBTCEarnings / ( double.Parse( XPMBTCmarket.Return.Buyorders[0].Buyprice ) * 0.997d ) );
 
                 //zorg dat er een trade van 1 xpm instaat
-                if( priceNeededOfferStrat > double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d )
+                if( priceNeededOfferStrat > double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump )
                 {
                     Task<MyOrders>[] myOrders = { Task<MyOrders>.Factory.StartNew( () => getOrdersByMarketID( markets.XPMLTC.Marketid ) ) };
                     countClean++;
@@ -1506,10 +1523,10 @@ namespace Cryptsy
                             Console.WriteLine( " INITIAL XPM" );
 
                             //Buy new XPM
-                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) ) };
+                            Task<OrderResponse>[] orderArray = { Task<OrderResponse>.Factory.StartNew( () => placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) ) };
 
-                            currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d;
+                            currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d;
                             if( orderArray[0].Result.Success.Equals( "1" ) )
                             {
                                 currentOrder = orderArray[0].Result;
@@ -1543,9 +1560,9 @@ namespace Cryptsy
 
                             cancelOrdersOnMarket( markets.XPMLTC.Marketid );
 
-                            currentOrder = placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d );
-                            currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d;
-                            ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + 0.00000002d ) * 1.002d;
+                            currentOrder = placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump );
+                            currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump;
+                            ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[0].Buyprice ) + raiseJump ) * 1.002d;
                             if( !currentOrder.Success.Equals( "1" ) )
                             {
                                 currentOrder = null;
@@ -1561,17 +1578,17 @@ namespace Cryptsy
                         {
                             Console.WriteLine( "Doing cleanup!" );
 
-                            if( ( currentPrice - double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) ) > 0.00000002d )
+                            if( ( currentPrice - double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) ) > raiseJump )
                             {
                                 Console.WriteLine( "Found gap between 1 and 2 price" );
                                 cancelOrdersOnMarket( markets.XPMLTC.Marketid );
-                                currentOrder = placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d );
+                                currentOrder = placeOrder( markets.XPMLTC.Marketid, "Buy", 1, double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump );
                                 if( !currentOrder.Success.Equals( "1" ) )
                                 {
                                     currentOrder = null;
                                 }
-                                currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d;
-                                ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + 0.00000002d ) * 1.002d;
+                                currentPrice = double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump;
+                                ltcSpend = ( double.Parse( xpmltcmarket.Return.Buyorders[1].Buyprice ) + raiseJump ) * 1.002d;
                             }
                             countClean = 0;
                         }
@@ -1641,6 +1658,45 @@ namespace Cryptsy
             {
                 Console.WriteLine( "Cancelling failed!" );
                 cancelOrdersOnMarket( marketID );
+            }
+        }
+
+        private static void cancelOrder( string orderid )
+        {
+            HttpWebRequest httpWReq = (HttpWebRequest)WebRequest.Create( "https://www.Cryptsy.com/api" );
+            string nonce = DateTime.UtcNow.Subtract( new DateTime( 1988, 7, 21 ) ).TotalSeconds.ToString();
+            string postData =
+                "method=cancelorder&orderid=" + orderid +
+                "&nonce=" + nonce;
+
+            byte[] data = encoding.GetBytes( postData );
+
+            HMACSHA512 crypt = new HMACSHA512( encoding.GetBytes( sKey ) );
+            string signedData = ByteToString( crypt.ComputeHash( data ) ).ToLower();
+
+            httpWReq.Method = "POST";
+            httpWReq.ContentType = "application/x-www-form-urlencoded";
+            httpWReq.ContentLength = data.Length;
+            httpWReq.Headers.Add( "Key", key );
+            httpWReq.Headers.Add( "Sign", signedData );
+            httpWReq.Timeout = 10000;
+
+            HttpWebResponse response2;
+            try
+            {
+
+                using( Stream stream = httpWReq.GetRequestStream() )
+                {
+                    stream.Write( data, 0, data.Length );
+                }
+
+                response2 = (HttpWebResponse)httpWReq.GetResponse();
+                string responseString = new StreamReader( response2.GetResponseStream() ).ReadToEnd();
+            }
+            catch( Exception e )
+            {
+                Console.WriteLine( "Cancelling failed!" );
+                cancelOrdersOnMarket( orderid );
             }
         }
 
