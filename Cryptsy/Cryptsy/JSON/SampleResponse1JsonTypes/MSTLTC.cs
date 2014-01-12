@@ -41,13 +41,13 @@ namespace Cryptsy.SampleResponse1JsonTypes
         public string Secondarycode { get; set; }
 
         [JsonProperty("recenttrades")]
-        public Recenttrade26[] Recenttrades { get; set; }
+        public Recenttrade30[] Recenttrades { get; set; }
 
         [JsonProperty("sellorders")]
-        public Sellorder26[] Sellorders { get; set; }
+        public Sellorder30[] Sellorders { get; set; }
 
         [JsonProperty("buyorders")]
-        public Buyorder25[] Buyorders { get; set; }
+        public Buyorder29[] Buyorders { get; set; }
     }
 
 }

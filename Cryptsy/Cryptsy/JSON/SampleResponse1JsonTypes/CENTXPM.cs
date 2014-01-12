@@ -47,7 +47,7 @@ namespace Cryptsy.SampleResponse1JsonTypes
         public Sellorder3[] Sellorders { get; set; }
 
         [JsonProperty("buyorders")]
-        public Buyorder3[] Buyorders { get; set; }
+        public object Buyorders { get; set; }
     }
 
 }
