@@ -572,6 +572,7 @@
   <ItemGroup>
     <None Include="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="start.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
